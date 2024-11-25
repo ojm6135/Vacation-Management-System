@@ -16,7 +16,6 @@ public final class VacationPeriod {
     private LocalDate startDate;
     private LocalDate endDate;
 
-    @QueryProjection
     public VacationPeriod(LocalDate startDate, LocalDate endDate) {
         validate(startDate, endDate);
 
