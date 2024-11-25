@@ -4,9 +4,11 @@ import com.ojm.vacation_management.domain.User;
 import com.ojm.vacation_management.vo.user.UserStatus;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface UserRepository {
-    public void save(User user);
-    public List<User> findAll();
-    public List<User> findAllByStatus(UserStatus status);
+    void save(User user);
+    Optional<User> findById(int id);
+    List<User> findAll();
+    List<User> findAllByStatus(UserStatus status);
 }

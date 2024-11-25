@@ -1,13 +1,27 @@
 package com.ojm.vacation_management.vo.vacation;
 
 import com.ojm.vacation_management.exceptions.InvalidDateRangeException;
+import com.querydsl.core.annotations.QueryProjection;
+import jakarta.persistence.Embeddable;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.Objects;
 
-public record VacationPeriod(LocalDate startDate, LocalDate endDate) {
-    public VacationPeriod {
+@Getter
+@NoArgsConstructor
+@Embeddable
+public final class VacationPeriod {
+    private LocalDate startDate;
+    private LocalDate endDate;
+
+    @QueryProjection
+    public VacationPeriod(LocalDate startDate, LocalDate endDate) {
         validate(startDate, endDate);
 
+        this.startDate = startDate;
+        this.endDate = endDate;
     }
 
     private boolean validate(LocalDate startDate, LocalDate endDate) {
@@ -31,6 +45,11 @@ public record VacationPeriod(LocalDate startDate, LocalDate endDate) {
         return "VacationPeriod[" +
                 "startDate=" + startDate + ", " +
                 "endDate=" + endDate + ']';
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(startDate, endDate);
     }
 
 
