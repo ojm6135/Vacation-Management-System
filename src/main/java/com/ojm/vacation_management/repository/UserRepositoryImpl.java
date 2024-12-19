@@ -16,7 +16,6 @@ import java.util.Optional;
 @Repository
 public class UserRepositoryImpl implements UserRepository {
     private final EntityManager em;
-
     private final JPAQueryFactory queryFactory;
     private final QUser user;
 
@@ -38,6 +37,14 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
+    public Optional<User> findByUsername(String username) {
+        User u = queryFactory.selectFrom(user)
+                .where(user.username.eq(username))
+                .fetchOne();
+        return Optional.ofNullable(u);
+    }
+
+    @Override
     public List<User> findAll() {
         return queryFactory.selectFrom(user).fetch();
     }
@@ -53,7 +60,7 @@ public class UserRepositoryImpl implements UserRepository {
     public void updateUserRole(int id, UserRole updatedRole) {
         Optional<User> userOptional = findById(id);
         userOptional.ifPresentOrElse(user -> {
-            user.setRole(updatedRole);
+            user.changeRole(updatedRole);
         }, () -> {
             throw new NoSuchElementException("id가 " + id + "인 회원이 존재하지 않습니다.");
         });
@@ -63,7 +70,7 @@ public class UserRepositoryImpl implements UserRepository {
     public void updateUserStatus(int id, UserStatus updatedStatus) {
         Optional<User> userOptional = findById(id);
         userOptional.ifPresentOrElse(user -> {
-            user.setStatus(updatedStatus);
+            user.changeStatus(updatedStatus);
         }, () -> {
             throw new NoSuchElementException("id가 " + id + "인 회원이 존재하지 않습니다.");
         });
