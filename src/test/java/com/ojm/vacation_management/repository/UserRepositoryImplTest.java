@@ -4,6 +4,7 @@ import com.ojm.vacation_management.domain.User;
 import com.ojm.vacation_management.vo.user.UserRole;
 import com.ojm.vacation_management.vo.user.UserStatus;
 import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -14,22 +15,57 @@ import java.util.List;
 @SpringBootTest
 @Transactional
 class UserRepositoryImplTest {
-
     private final UserRepository userRepository;
+    private User user1;
+    private User user2;
+    private User user3;
 
     @Autowired
     UserRepositoryImplTest(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
+    @BeforeEach
+    void BeforeEach() {
+        user1 = User.builder()
+                .name("박보영")
+                .username("bbovly")
+                .password("park1234!!")
+                .role(UserRole.ADMIN)
+                .status(UserStatus.ON_VACATION)
+                .build();
+
+        user2 = User.builder()
+                .name("권지용")
+                .username("xxxibgdrgn")
+                .password("gdgdbabybaby")
+                .role(UserRole.MEMBER)
+                .status(UserStatus.ON_WORK)
+                .build();
+
+        user3 = User.builder()
+                .name("유지민")
+                .username("realkarina")
+                .password("winter123@")
+                .role(UserRole.MEMBER)
+                .status(UserStatus.ON_WORK)
+                .build();
+
+        userRepository.save(user1);
+        userRepository.save(user2);
+        userRepository.save(user3);
+    }
+
     @Test
     void save() {
         // given
-        User user = new User();
-        user.setName("koo");
-        user.setPassword("1q2w3e4r!");
-        user.setRole(UserRole.MEMBER);
-        user.setStatus(UserStatus.ON_WORK);
+        User user = User.builder()
+                .name("박명수")
+                .username("geosung")
+                .password("greatpark!")
+                .role(UserRole.ADMIN)
+                .status(UserStatus.ON_VACATION)
+                .build();
 
         // when
         userRepository.save(user);
@@ -42,20 +78,6 @@ class UserRepositoryImplTest {
     @Test
     void findById() {
         // given
-        User user1 = new User();
-        user1.setName("koo");
-        user1.setPassword("1q2w3e4r!");
-        user1.setRole(UserRole.MEMBER);
-        user1.setStatus(UserStatus.ON_WORK);
-
-        User user2 = new User();
-        user2.setName("goo");
-        user2.setPassword("1q2w3e4r!");
-        user2.setRole(UserRole.MEMBER);
-        user2.setStatus(UserStatus.ON_VACATION);
-
-        userRepository.save(user1);
-        userRepository.save(user2);
 
         // when
         User result1 = userRepository.findById(user1.getId()).get();
@@ -67,29 +89,19 @@ class UserRepositoryImplTest {
     }
 
     @Test
+    void findByUsername() {
+        // given
+
+        // when
+        User result = userRepository.findByUsername("xxxibgdrgn").get();
+
+        // then
+        Assertions.assertThat(result.getUsername()).isEqualTo("xxxibgdrgn");
+    }
+
+    @Test
     void findAll() {
         // given
-        User user1 = new User();
-        user1.setName("koo");
-        user1.setPassword("1q2w3e4r!");
-        user1.setRole(UserRole.MEMBER);
-        user1.setStatus(UserStatus.ON_WORK);
-
-        User user2 = new User();
-        user2.setName("goo");
-        user2.setPassword("1q2w3e4r!");
-        user2.setRole(UserRole.MEMBER);
-        user2.setStatus(UserStatus.ON_VACATION);
-
-        User user3 = new User();
-        user3.setName("ooo");
-        user3.setPassword("1q2w3e4r!");
-        user3.setRole(UserRole.APPROVER);
-        user3.setStatus(UserStatus.ON_WORK);
-
-        userRepository.save(user1);
-        userRepository.save(user2);
-        userRepository.save(user3);
 
         // when
         List<User> result = userRepository.findAll();
@@ -101,27 +113,6 @@ class UserRepositoryImplTest {
     @Test
     void findAllByStatus() {
         // given
-        User user1 = new User();
-        user1.setName("koo");
-        user1.setPassword("1q2w3e4r!");
-        user1.setRole(UserRole.MEMBER);
-        user1.setStatus(UserStatus.ON_WORK);
-
-        User user2 = new User();
-        user2.setName("goo");
-        user2.setPassword("1q2w3e4r!");
-        user2.setRole(UserRole.MEMBER);
-        user2.setStatus(UserStatus.ON_VACATION);
-
-        User user3 = new User();
-        user3.setName("ooo");
-        user3.setPassword("1q2w3e4r!");
-        user3.setRole(UserRole.APPROVER);
-        user3.setStatus(UserStatus.ON_WORK);
-
-        userRepository.save(user1);
-        userRepository.save(user2);
-        userRepository.save(user3);
 
         // when
         List<User> resultOnWork = userRepository.findAllByStatus(UserStatus.ON_WORK);
@@ -130,5 +121,31 @@ class UserRepositoryImplTest {
         // then
         Assertions.assertThat(resultOnWork.size()).isEqualTo(2);
         Assertions.assertThat(resultOnVacation.size()).isEqualTo(1);
+    }
+
+    @Test
+    void updateUserRole() {
+        // given
+
+        // when
+        userRepository.updateUserRole(user1.getId(), UserRole.MEMBER);
+        userRepository.updateUserRole(user2.getId(), UserRole.ADMIN);
+
+        // then
+        Assertions.assertThat(user1.getRole()).isEqualTo(UserRole.MEMBER);
+        Assertions.assertThat(user2.getRole()).isEqualTo(UserRole.ADMIN);
+    }
+
+    @Test
+    void updateUserStatus() {
+        // given
+
+        // when
+        userRepository.updateUserStatus(user1.getId(), UserStatus.ON_WORK);
+        userRepository.updateUserStatus(user2.getId(), UserStatus.ON_VACATION);
+
+        // then
+        Assertions.assertThat(user1.getStatus()).isEqualTo(UserStatus.ON_WORK);
+        Assertions.assertThat(user2.getStatus()).isEqualTo(UserStatus.ON_VACATION);
     }
 }

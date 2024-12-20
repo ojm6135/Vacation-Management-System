@@ -29,6 +29,8 @@ public class QUser extends EntityPathBase<User> {
 
     public final EnumPath<com.ojm.vacation_management.vo.user.UserStatus> status = createEnum("status", com.ojm.vacation_management.vo.user.UserStatus.class);
 
+    public final StringPath username = createString("username");
+
     public QUser(String variable) {
         super(User.class, forVariable(variable));
     }
