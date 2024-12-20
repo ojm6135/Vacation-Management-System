@@ -1,5 +1,7 @@
 package com.ojm.vacation_management.form;
 
+import com.ojm.vacation_management.vo.user.UserRole;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -16,8 +18,11 @@ public class UserRegistrationForm {
     @Pattern(regexp = "[\\w!@#$%^&*_=+.,?-]+")
     private final String password;
 
-    @Pattern(regexp = "\\S[a-zA-z가-힣 ]+$")
+    @Pattern(regexp = "\\S[a-zA-z가-힣 ]+\\S$")
     private final String name;
+
+    @NotNull
+    private final UserRole role;
 
     @Override
     public String toString() {
@@ -25,6 +30,7 @@ public class UserRegistrationForm {
                 "username='" + username + '\'' +
                 ", password='" + password + '\'' +
                 ", name='" + name + '\'' +
+                ", role=" + role +
                 '}';
     }
 }
