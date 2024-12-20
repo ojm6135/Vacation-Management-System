@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -22,11 +22,14 @@
             border-radius: 8px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             width: 300px;
+            box-sizing: border-box;
         }
 
         .form-container h2 {
             text-align: center;
             margin-bottom: 20px;
+            font-size: 24px;
+            color: #333;
         }
 
         .form-container label {
@@ -36,13 +39,26 @@
             margin-bottom: 8px;
         }
 
-        .form-container input {
+        .form-container input,
+        .form-container select {
             width: 100%;
             padding: 10px;
             margin-bottom: 15px;
             border: 1px solid #ddd;
             border-radius: 4px;
             font-size: 14px;
+            box-sizing: border-box;
+        }
+
+        .form-container select {
+            background-color: #fff;
+            cursor: pointer;
+        }
+
+        .form-container input:focus,
+        .form-container select:focus {
+            border-color: #4CAF50;
+            outline: none;
         }
 
         .form-container button {
@@ -54,6 +70,7 @@
             border-radius: 4px;
             font-size: 16px;
             cursor: pointer;
+            box-sizing: border-box;
         }
 
         .form-container button:hover {
@@ -82,11 +99,17 @@
         <label for="name">이름</label>
         <input type="text" id="name" name="name" required placeholder="이름을 입력하세요">
 
-        <label for="id">아이디</label>
-        <input type="text" id="id" name="id" required placeholder="아이디를 입력하세요">
+        <label for="username">아이디</label>
+        <input type="text" id="username" name="username" required placeholder="아이디를 입력하세요">
 
         <label for="password">비밀번호</label>
         <input type="password" id="password" name="password" required placeholder="비밀번호를 입력하세요">
+
+        <label for="role">회원 유형</label>
+        <select id="role" name="role" required>
+            <option value="" disabled selected>회원 유형을 선택하세요</option>
+            <option th:each="role : ${roles}" th:value="${role}" th:text="${role.getDesc()}"></option>
+        </select>
 
         <button type="submit">회원가입</button>
     </form>
