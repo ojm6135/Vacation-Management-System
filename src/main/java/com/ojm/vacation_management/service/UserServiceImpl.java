@@ -1,13 +1,16 @@
 package com.ojm.vacation_management.service;
 
 import com.ojm.vacation_management.domain.User;
+import com.ojm.vacation_management.dto.LoginDto;
 import com.ojm.vacation_management.dto.UserDto;
 import com.ojm.vacation_management.dto.UserRegistrationDto;
 import com.ojm.vacation_management.repository.UserRepository;
+import com.ojm.vacation_management.utils.EncodePasswordUtils;
 import com.ojm.vacation_management.vo.user.UserRole;
 import com.ojm.vacation_management.vo.user.UserStatus;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,13 +30,40 @@ public class UserServiceImpl implements UserService {
     @Override
     public void join(UserRegistrationDto userRegistrationDto) {
         // 중복 확인
-        if (userRepository.findByUsername(userRegistrationDto.getUsername()).isPresent()) {
-            throw new IllegalArgumentException("해당 아이디가 이미 존재합니다.");
-        }
+        userRepository.findByUsername(userRegistrationDto.getUsername())
+                .ifPresent(u -> {
+                    throw new IllegalStateException("해당 아이디가 이미 존재합니다.");
+                });
+
+        // 비밀번호 암호화
+        PasswordEncoder passwordEncoder = EncodePasswordUtils.passwordEncoder();
+        String encodedPassword = passwordEncoder.encode(userRegistrationDto.getPassword());
+
+        // 비밀번호 재설정
+        userRegistrationDto.changeHashedPassword(encodedPassword);
 
         // 저장
         User user = UserRegistrationDto.toEntity(userRegistrationDto);
         userRepository.save(user);
+    }
+
+    @Override
+    public UserDto login(LoginDto loginDto) {
+        Optional<User> userOptional = userRepository.findByUsername(loginDto.getUsername());
+
+        // 아이디 존재 여부 확인
+        if (userOptional.isEmpty()) {
+            throw new IllegalArgumentException("입력한 정보가 일치하지 않습니다.");
+        }
+
+        User user = userOptional.get();
+
+        // 비밀번호 일치 확인
+        if (EncodePasswordUtils.passwordEncoder().matches(loginDto.getPassword(), user.getPassword())) {
+            return UserDto.fromEntity(user);
+        } else {
+            throw new IllegalArgumentException("입력한 정보가 일치하지 않습니다.");
+        }
     }
 
     @Override

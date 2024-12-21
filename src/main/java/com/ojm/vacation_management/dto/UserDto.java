@@ -34,6 +34,4 @@ public class UserDto {
                 .status(userDto.getStatus())
                 .build();
     }
-
-
 }
