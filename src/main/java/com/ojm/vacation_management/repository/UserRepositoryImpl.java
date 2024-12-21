@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @Repository
@@ -41,6 +40,7 @@ public class UserRepositoryImpl implements UserRepository {
         User u = queryFactory.selectFrom(user)
                 .where(user.username.eq(username))
                 .fetchOne();
+
         return Optional.ofNullable(u);
     }
 
@@ -58,22 +58,14 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public void updateUserRole(int id, UserRole updatedRole) {
-        Optional<User> userOptional = findById(id);
-        userOptional.ifPresentOrElse(user -> {
-            user.changeRole(updatedRole);
-        }, () -> {
-            throw new NoSuchElementException("id가 " + id + "인 회원이 존재하지 않습니다.");
-        });
+        User target = em.find(User.class, id);
+        target.changeRole(updatedRole);
     }
 
     @Override
     public void updateUserStatus(int id, UserStatus updatedStatus) {
-        Optional<User> userOptional = findById(id);
-        userOptional.ifPresentOrElse(user -> {
-            user.changeStatus(updatedStatus);
-        }, () -> {
-            throw new NoSuchElementException("id가 " + id + "인 회원이 존재하지 않습니다.");
-        });
+        User target = em.find(User.class, id);
+        target.changeStatus(updatedStatus);
     }
 }
 
