@@ -11,7 +11,7 @@ import lombok.Getter;
 @Getter
 public class UserRegistrationDto {
     private final String username;
-    private final String password;
+    private String password;
     private final String name;
     private final UserRole role;
 
@@ -32,5 +32,9 @@ public class UserRegistrationDto {
                 .role(dto.getRole())
                 .status(UserStatus.ON_WORK)
                 .build();
+    }
+
+    public void changeHashedPassword(String hashedPassword) {
+        this.password = hashedPassword;
     }
 }
