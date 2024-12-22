@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Vacations Table</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            height: 100vh;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .title {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .table-wrapper {
+            width: 60%; /* 고정된 너비 */
+            position: relative;
+        }
+
+        .table-container {
+            width: 100%;
+            max-height: 350px;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: center;
+        }
+
+        .sticky-header th {
+            background-color: #e6e6e6;
+            position: sticky;
+            padding: 10px;
+            top: 0;
+            z-index: 1;
+            outline: 1px solid #ccc;
+        }
+
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        .modify-btn {
+            background-color: #4CAF50;
+            color: white;
+            padding: 5px 10px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+
+        .modify-btn:hover {
+            background-color: #45a049;
+        }
+
+        .form-container {
+            width: 100%; /* 테이블과 동일한 너비 */
+            box-sizing: border-box;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            margin-top: 30px;
+        }
+
+        form {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+            flex-wrap: wrap; /* 요소들이 화면에 맞게 줄 바꿈 */
+            width: 100%;
+        }
+
+        .form-container div {
+            display: flex;
+            flex-direction: column;
+            width: 20%;
+        }
+
+        label {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        input, select {
+            width: 50%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        #reason {
+            width: 80%;
+        }
+
+        .add-btn {
+            background-color: #007bff;
+            color: white;
+            padding: 7px 15px;
+            font-size: 15px;
+            cursor: pointer;
+            border-radius: 4px;
+            width: auto;
+            flex-shrink: 0;
+        }
+
+        .add-btn:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+<h1 class="title">My Vacations</h1>
+
+<div class="table-wrapper">
+    <div class="table-container">
+        <table>
+            <thead>
+            <tr class="sticky-header">
+                <th></th>
+                <th>시작일</th>
+                <th>종료일</th>
+                <th>구분</th>
+                <th>사유</th>
+                <th>승인 상태</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="vacation : ${vacations}">
+                <td th:text="${vacation.id}"></td>
+                <td th:text="${vacation.period.startDate}"></td>
+                <td th:text="${vacation.period.endDate}"></td>
+                <td th:text="${vacation.type.desc}"></td>
+                <td th:text="${vacation.reason}"></td>
+                <td th:text="${vacation.status.desc}"></td>
+                <td><button class="modify-btn">수정</button></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="form-container">
+        <form action="#" method="post">
+            <div>
+                <label for="start-date">시작일</label>
+                <input type="date" id="start-date" name="start-date" required>
+            </div>
+            <div>
+                <label for="end-date">종료일</label>
+                <input type="date" id="end-date" name="end-date" required>
+            </div>
+            <div>
+                <label for="leave-type">종류</label>
+                <select id="leave-type" name="leave-type" required>
+                    <option value="">선택하세요</option>
+                    <option value="paid">유급휴가</option>
+                    <option value="sick">병가</option>
+                    <option value="unpaid">무급휴가</option>
+                </select>
+            </div>
+            <div>
+                <label for="reason">사유</label>
+                <input id="reason" name="reason" required>
+            </div>
+            <button class="add-btn" type="submit">신청</button>
+        </form>
+    </div>
+</div>
+</body>
+</html>
