@@ -3,7 +3,6 @@ package com.ojm.vacation_management.repository;
 import com.ojm.vacation_management.domain.QVacation;
 import com.ojm.vacation_management.domain.Vacation;
 import com.ojm.vacation_management.vo.vacation.AppliedVacationStatus;
-import com.ojm.vacation_management.vo.vacation.QVacationPeriod;
 import com.ojm.vacation_management.vo.vacation.VacationPeriod;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
@@ -16,11 +15,13 @@ import java.util.List;
 public class VacationRepositoryImpl implements VacationRepository {
     private final EntityManager em;
     private final JPAQueryFactory queryFactory;
+    private final QVacation vacation;
 
     @Autowired
     public VacationRepositoryImpl(EntityManager em, JPAQueryFactory queryFactory) {
         this.em = em;
         this.queryFactory = queryFactory;
+        this.vacation = QVacation.vacation;
     }
 
     @Override
@@ -30,21 +31,19 @@ public class VacationRepositoryImpl implements VacationRepository {
 
     @Override
     public List<Vacation> findAll() {
-        return em.createQuery("select v from Vacation v", Vacation.class)
-                .getResultList();
+        return queryFactory.selectFrom(vacation)
+                .fetch();
     }
 
     @Override
     public List<Vacation> findAllByUserId(int userId) {
-        return em.createQuery("select v from Vacation v where v.userId = :userId", Vacation.class)
-                .setParameter("userId", userId)
-                .getResultList();
+        return queryFactory.selectFrom(vacation)
+                .where(vacation.userId.eq(userId))
+                .fetch();
     }
 
     @Override
     public List<Vacation> findAllByPeriod(VacationPeriod target) {
-        QVacation vacation = QVacation.vacation;
-
         return queryFactory.selectFrom(vacation)
                 .where(vacation.period.startDate
                         .after(target.getEndDate())
@@ -57,18 +56,17 @@ public class VacationRepositoryImpl implements VacationRepository {
 
     @Override
     public void updateStatus(int id, AppliedVacationStatus status) {
-        Vacation target = em.find(Vacation.class, id);
-        target.setStatus(status);
+
     }
 
     @Override
     public void updatePeriod(int id, VacationPeriod period) {
-        Vacation target = em.find(Vacation.class, id);
-        target.setPeriod(period);
+
     }
 
     @Override
     public void deleteById(int id) {
-        em.remove(em.find(Vacation.class, id));
+        queryFactory.delete(vacation)
+                        .where(vacation.id.eq(id));
     }
 }
