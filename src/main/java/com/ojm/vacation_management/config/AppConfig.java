@@ -1,4 +1,4 @@
-package com.ojm.vacation_management;
+package com.ojm.vacation_management.config;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;

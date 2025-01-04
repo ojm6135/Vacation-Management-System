@@ -4,7 +4,7 @@ import lombok.Getter;
 
 @Getter
 public enum AppliedVacationStatus {
-    PENDING(0, "대기중"),
+    PENDING(0, "대기 중"),
     APPROVED(1, "승인"),
     REJECTED(2, "반려");
 
