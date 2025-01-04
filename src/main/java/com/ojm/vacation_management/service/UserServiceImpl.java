@@ -1,16 +1,15 @@
 package com.ojm.vacation_management.service;
 
 import com.ojm.vacation_management.domain.User;
-import com.ojm.vacation_management.dto.LoginDto;
 import com.ojm.vacation_management.dto.UserDto;
 import com.ojm.vacation_management.dto.UserRegistrationDto;
 import com.ojm.vacation_management.repository.UserRepository;
-import com.ojm.vacation_management.utils.EncodePasswordUtils;
 import com.ojm.vacation_management.vo.user.UserRole;
 import com.ojm.vacation_management.vo.user.UserStatus;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,10 +20,12 @@ import java.util.Optional;
 @Service
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepository) {
+    public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder bCryptPasswordEncoder) {
         this.userRepository = userRepository;
+        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
 
     @Override
@@ -36,8 +37,7 @@ public class UserServiceImpl implements UserService {
                 });
 
         // 비밀번호 암호화
-        PasswordEncoder passwordEncoder = EncodePasswordUtils.passwordEncoder();
-        String encodedPassword = passwordEncoder.encode(userRegistrationDto.getPassword());
+        String encodedPassword = bCryptPasswordEncoder.encode(userRegistrationDto.getPassword());
 
         // 비밀번호 재설정
         userRegistrationDto.changeHashedPassword(encodedPassword);
@@ -47,24 +47,24 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
     }
 
-    @Override
-    public UserDto login(LoginDto loginDto) {
-        Optional<User> userOptional = userRepository.findByUsername(loginDto.getUsername());
-
-        // 아이디 존재 여부 확인
-        if (userOptional.isEmpty()) {
-            throw new IllegalArgumentException("입력한 정보가 일치하지 않습니다.");
-        }
-
-        User user = userOptional.get();
-
-        // 비밀번호 일치 확인
-        if (EncodePasswordUtils.passwordEncoder().matches(loginDto.getPassword(), user.getPassword())) {
-            return UserDto.fromEntity(user);
-        } else {
-            throw new IllegalArgumentException("입력한 정보가 일치하지 않습니다.");
-        }
-    }
+//    @Override
+//    public UserDto login(LoginDto loginDto) {
+//        Optional<User> userOptional = userRepository.findByUsername(loginDto.getUsername());
+//
+//        // 아이디 존재 여부 확인
+//        if (userOptional.isEmpty()) {
+//            throw new IllegalArgumentException("입력한 정보가 일치하지 않습니다.");
+//        }
+//
+//        User user = userOptional.get();
+//
+//        // 비밀번호 일치 확인
+//        if (EncodePasswordUtils.passwordEncoder().matches(loginDto.getPassword(), user.getPassword())) {
+//            return UserDto.fromEntity(user);
+//        } else {
+//            throw new IllegalArgumentException("입력한 정보가 일치하지 않습니다.");
+//        }
+//    }
 
     @Override
     public List<User> findUsers() {
@@ -99,7 +99,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void modifyUserRole(int id, UserRole role) {
         if (userRepository.findById(id).isEmpty()) {
-            throw new EntityNotFoundException("해당 아이디를 갖는 회원이 없습니다.");
+            throw new EntityNotFoundException("해당 아이디를 갖는 회원이 존재하지 않습니다.");
         }
 
         userRepository.updateUserRole(id, role);
@@ -108,7 +108,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void modifyUserStatus(int id, UserStatus status) {
         if (userRepository.findById(id).isEmpty()) {
-            throw new EntityNotFoundException("해당 아이디를 갖는 회원이 없습니다.");
+            throw new EntityNotFoundException("해당 아이디를 갖는 회원이 존재하지 않습니다.");
         }
 
         userRepository.updateUserStatus(id, status);

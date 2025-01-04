@@ -20,6 +20,7 @@ public class User {
     private int id;
 
     @Length(min = 8, max = 15)
+    @Column(unique = true)
     private String username;
 
     @Length(max = 73)  // BCrypt Hash Algorithm
