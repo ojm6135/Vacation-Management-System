@@ -26,6 +26,7 @@ public class SecurityConfig {
         http
                 .formLogin((auth) -> auth.loginPage("/users/login")
                         .loginProcessingUrl("/users/login").permitAll()
+                        .defaultSuccessUrl("/vacations/my")
                 );
 
         return http.build();

@@ -17,4 +17,6 @@ public interface UserService {
     List<User> findUsersByStatus(UserStatus userStatus);
     void modifyUserRole(int id, UserRole role);
     void modifyUserStatus(int id, UserStatus status);
+    boolean isCurrentUser(int requestedUserId);
+    String generateVacationUrlByCurrentUser();
 }

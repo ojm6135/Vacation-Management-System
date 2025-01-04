@@ -113,4 +113,25 @@ public class UserServiceImpl implements UserService {
 
         userRepository.updateUserStatus(id, status);
     }
+
+    @Override
+    public boolean isCurrentUser(int requestedUserId) {
+        String currentUsername = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        return findOneById(requestedUserId)
+                .getUsername()
+                .equals(currentUsername);
+    }
+
+    @Override
+    public String generateVacationUrlByCurrentUser() {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        Optional<User> userOptional = userRepository.findByUsername(username);
+
+        if (userOptional.isEmpty()) {
+            throw new IllegalArgumentException("해당 아이디를 갖는 회원이 존재하지 않습니다.");
+        }
+
+        return "/vacations?user_id=" + userOptional.get().getId();
+    }
 }
