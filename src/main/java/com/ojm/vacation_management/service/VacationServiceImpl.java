@@ -3,6 +3,7 @@ package com.ojm.vacation_management.service;
 import com.ojm.vacation_management.dto.VacationDto;
 import com.ojm.vacation_management.repository.VacationRepository;
 import com.ojm.vacation_management.vo.vacation.AppliedVacationStatus;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,18 +28,18 @@ public class VacationServiceImpl implements VacationService {
     }
 
     @Override
-    public List<VacationDto> findAllByUserId(int userId) {
+    public List<VacationDto> getAllVacationsByUserId(int userId) {
         return vacationRepository.findAllByUserId(userId)
                 .stream().map(VacationDto::fromEntity)
                 .collect(Collectors.toList());
     }
 
     @Override
-    public void updateVacation(VacationDto vacationDto) {
-        if (vacationRepository.findById(vacationDto.getId()).isEmpty()) {
-            throw new EntityNotFoundException("휴가를 찾을 수 없습니다. (id: " + vacationDto.getId() + ")");
+    public void updateVacation(int vacationId, VacationDto vacationDto) {
+        if (vacationRepository.findById(vacationId).isEmpty()) {
+            throw new EntityNotFoundException("휴가를 찾을 수 없습니다. (id: " + vacationId + ")");
         }
-        vacationRepository.update(VacationDto.toEntity(vacationDto));
+        vacationRepository.update(vacationId, VacationDto.toEntity(vacationDto));
     }
 
     @Override

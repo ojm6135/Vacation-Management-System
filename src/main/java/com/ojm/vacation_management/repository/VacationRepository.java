@@ -12,6 +12,6 @@ public interface VacationRepository {
     List<Vacation> findAll();
     List<Vacation> findAllByUserId(int userId);
     List<Vacation> findAllByPeriod(VacationPeriod period);
-    void update(Vacation vacation);
+    void update(int vacationId, Vacation vacation);
     void deleteById(int id);
 }

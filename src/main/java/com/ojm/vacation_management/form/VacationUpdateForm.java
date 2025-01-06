@@ -12,9 +12,6 @@ import java.time.LocalDate;
 @Getter
 @AllArgsConstructor
 public class VacationUpdateForm {
-    @NotNull(message = "휴가 id가 필요합니다.")
-    private final int id;
-
     @NotNull(message = "시작 날짜가 입력되지 않았습니다.")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private final LocalDate startDate;

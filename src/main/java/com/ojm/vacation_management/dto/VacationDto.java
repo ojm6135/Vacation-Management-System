@@ -58,7 +58,6 @@ public class VacationDto {
         VacationPeriod period = new VacationPeriod(form.getStartDate(), form.getEndDate());
 
         return VacationDto.builder()
-                .id(form.getId())
                 .period(period)
                 .type(form.getType())
                 .reason(form.getReason())

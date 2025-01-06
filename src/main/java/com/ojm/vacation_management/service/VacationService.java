@@ -7,6 +7,6 @@ import java.util.List;
 public interface VacationService {
     void apply(VacationDto vacationDto);
     List<VacationDto> getAllVacationsByUserId(int userId);
-    void updateVacation(VacationDto vacationDto);
+    void updateVacation(int vacationId, VacationDto vacationDto);
     void deleteVacation(int vacationId);
 }

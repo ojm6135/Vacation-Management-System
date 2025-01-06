@@ -60,8 +60,8 @@ public class VacationRepositoryImpl implements VacationRepository {
     }
 
     @Override
-    public void update(Vacation updatedVacation) {
-        Vacation target = em.find(Vacation.class, updatedVacation.getId());
+    public void update(int vacationId, Vacation updatedVacation) {
+        Vacation target = em.find(Vacation.class, vacationId);
 
         target.changePeriod(updatedVacation.getPeriod());
         target.changeType(updatedVacation.getType());

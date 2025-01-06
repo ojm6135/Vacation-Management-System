@@ -131,7 +131,7 @@
             width: 80%;
         }
 
-        .add-btn {
+        .apply-btn {
             background-color: #007bff;
             color: white;
             padding: 7px 15px;
@@ -142,7 +142,7 @@
             flex-shrink: 0;
         }
 
-        .add-btn:hover {
+        .apply-btn:hover {
             background-color: #0056b3;
         }
     </style>
@@ -174,7 +174,7 @@
                 <td th:text="${vacation.status.desc}"></td>
                 <td>
                     <button class="modify-btn" type="button" onclick="modifyBtnEvent(this)">수정</button>
-                    <button class="delete-btn" type="button" th:onclick="|confirmDelete(${vacation.id})|">삭제</button>
+                    <button class="delete-btn" type="button" th:onclick="|deleteVacation(${vacation.id})|">삭제</button>
                 </td>
             </tr>
             </tbody>
@@ -182,7 +182,7 @@
     </div>
 
     <div class="form-container">
-        <form action="/vacations/apply" method="post">
+        <form action="/vacations" method="post">
             <input type="hidden" id="user-id" name="userId" th:value="${userId}" required>
             <div>
                 <label for="start-date">시작일</label>
@@ -203,13 +203,12 @@
                 <label for="reason">사유</label>
                 <input id="reason" name="reason" maxlength="25">
             </div>
-            <button class="add-btn" type="submit">신청</button>
+            <button class="apply-btn" type="submit">신청</button>
         </form>
     </div>
 
     <div id="modify-form" class="form-container" style="display: none">
-        <form action="/vacations/update" method="post">
-            <input type="hidden" id="modified-vacation-id" name="id" required>
+        <form id="modify-form-action" th:method="put">
             <div>
                 <label for="modified-start-date">시작일</label>
                 <input type="date" id="modified-start-date" name="startDate" required>
@@ -248,13 +247,14 @@
     function fillModifyForm(row) {
         const cells = row.querySelectorAll('td');
         const cellValues = Array.from(cells).map(cell => cell.textContent.trim());
+        const formElement = document.getElementById("modify-form-action");
 
         const id = cellValues[0];
         const startDate = cellValues[1];
         const endDate = cellValues[2];
         const reason = cellValues[4];
 
-        document.getElementById("modified-vacation-id").value = id;
+        formElement.action = "/vacations/" + id;
         document.getElementById("modified-start-date").value = startDate;
         document.getElementById("modified-end-date").value = endDate;
         document.getElementById("modified-reason").value = reason;
@@ -304,9 +304,20 @@
         fillModifyForm(row)
     }
 
-    function confirmDelete(vacationId) {
+    function deleteVacation(vacationId) {
         if (confirm("정말로 삭제하시겠습니까?")) {
-            window.location.href = '/vacations/delete/' + vacationId;
+            const form = document.createElement('form');
+            form.method = 'post';
+            form.action = `/vacations/${vacationId}`;
+
+            const methodInput = document.createElement('input');
+            methodInput.type = 'hidden';
+            methodInput.name = '_method';
+            methodInput.value = 'delete';
+            form.appendChild(methodInput);
+
+            document.body.appendChild(form);
+            form.submit();
         }
     }
 </script>
