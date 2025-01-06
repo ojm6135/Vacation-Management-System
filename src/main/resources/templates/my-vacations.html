@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Vacations Table</title>
+    <title>My Vacations</title>
     <style>
         body {
             margin: 0;
@@ -66,8 +66,28 @@
             border-radius: 4px;
         }
 
+        .delete-btn {
+            background-color: rgb(225, 35, 0);
+            color: white;
+            padding: 5px 10px;
+            cursor: pointer;
+            border-radius: 4px;
+            margin-left: 15%;
+        }
+
         .modify-btn:hover {
             background-color: #45a049;
+        }
+
+        .modify-complete-btn {
+            background-color: #4CAF50;
+            color: white;
+            padding: 7px 15px;
+            font-size: 15px;
+            cursor: pointer;
+            border-radius: 4px;
+            width: auto;
+            /*flex-shrink: 0;*/
         }
 
         .form-container {
@@ -107,7 +127,7 @@
             border-radius: 4px;
         }
 
-        #reason {
+        input[name="reason"] {
             width: 80%;
         }
 
@@ -145,14 +165,17 @@
             </tr>
             </thead>
             <tbody>
-            <tr th:each="vacation : ${vacations}">
+            <tr class="vacation" th:each="vacation : ${vacations}">
                 <td th:text="${vacation.id}"></td>
                 <td th:text="${vacation.period.startDate}"></td>
                 <td th:text="${vacation.period.endDate}"></td>
                 <td th:text="${vacation.type.desc}"></td>
-                <td th:text="${vacation.reason != null ? vacation.reason : '.'}"></td>
+                <td th:text="${vacation.reason != '' ? vacation.reason : '.'}"></td>
                 <td th:text="${vacation.status.desc}"></td>
-                <td><button class="modify-btn">수정</button></td>
+                <td>
+                    <button class="modify-btn" type="button" onclick="modifyBtnEvent(this)">수정</button>
+                    <button class="delete-btn" type="button" th:onclick="|confirmDelete(${vacation.id})|">삭제</button>
+                </td>
             </tr>
             </tbody>
         </table>
@@ -160,7 +183,7 @@
 
     <div class="form-container">
         <form action="/vacations/apply" method="post">
-            <input type="hidden" id="user-id" name="userId" th:value="${userId}" required >
+            <input type="hidden" id="user-id" name="userId" th:value="${userId}" required>
             <div>
                 <label for="start-date">시작일</label>
                 <input type="date" id="start-date" name="startDate" required>
@@ -178,11 +201,114 @@
             </div>
             <div>
                 <label for="reason">사유</label>
-                <input id="reason" name="reason">
+                <input id="reason" name="reason" maxlength="25">
             </div>
             <button class="add-btn" type="submit">신청</button>
         </form>
     </div>
+
+    <div id="modify-form" class="form-container" style="display: none">
+        <form action="/vacations/update" method="post">
+            <input type="hidden" id="modified-vacation-id" name="id" required>
+            <div>
+                <label for="modified-start-date">시작일</label>
+                <input type="date" id="modified-start-date" name="startDate" required>
+            </div>
+            <div>
+                <label for="modified-end-date">종료일</label>
+                <input type="date" id="modified-end-date" name="endDate" required>
+            </div>
+            <div>
+                <label for="modified-leave-type">종류</label>
+                <select id="modified-leave-type" name="type" required>
+                    <option value="" disabled selected>휴가 유형을 선택하세요</option>
+                    <option th:each="type : ${types}" th:value="${type}" th:text="${type.getDesc()}"></option>
+                </select>
+            </div>
+            <div>
+                <label for="modified-reason">사유</label>
+                <input id="modified-reason" name="reason" maxlength="25">
+            </div>
+            <button class="modify-complete-btn" type="submit">수정</button>
+        </form>
+    </div>
 </div>
+
+<script>
+    function changeBackgroundOfRow(button, color) {
+        const row = button.closest('tr');  // 클릭된 버튼의 가장 가까운 tr 요소 찾기
+        row.style.backgroundColor = color;
+    }
+
+    function changeBtnDesign(button, text, color) {
+        button.textContent = text;
+        button.style.backgroundColor = color;
+    }
+
+    function fillModifyForm(row) {
+        const cells = row.querySelectorAll('td');
+        const cellValues = Array.from(cells).map(cell => cell.textContent.trim());
+
+        const id = cellValues[0];
+        const startDate = cellValues[1];
+        const endDate = cellValues[2];
+        const reason = cellValues[4];
+
+        document.getElementById("modified-vacation-id").value = id;
+        document.getElementById("modified-start-date").value = startDate;
+        document.getElementById("modified-end-date").value = endDate;
+        document.getElementById("modified-reason").value = reason;
+
+        const typeSelect = document.getElementById("modified-leave-type");
+
+        // Select 박스 값 설정
+        const typeValue = cellValues[3]; // "Vacation", "Sick Leave", etc.
+        for (let option of typeSelect.options) {
+            if (option.textContent === typeValue) {
+                option.selected = true;
+                break;
+            }
+        }
+    }
+
+    function modifyBtnEvent(button) {
+        const modifyForm = document.getElementById("modify-form");
+        const formStatus = window.getComputedStyle(modifyForm).display;
+        const row = button.closest('tr');
+
+        // 클릭된 버튼이 수정상태일 때
+        if (button.textContent === "수정") {
+            if (formStatus === "block") {  // 수정 폼이 열려 있을 때
+                // 행의 배경색 바꿈, 취소 버튼을 수정 버튼으로 바꿈
+                const btns = Array.from(document.getElementsByClassName("modify-btn"));
+                const filteredBtns = btns.filter(btn => btn.textContent === "취소");
+
+                filteredBtns.forEach(btn => {
+                    changeBackgroundOfRow(btn, "");
+                    changeBtnDesign(btn, "수정", "#4CAF50");
+                })
+            } else if (formStatus === "none") {  // 수정 폼이 닫혀 있을 때
+                modifyForm.style.display = "block";
+            }
+
+            changeBtnDesign(button, "취소", "#FFA500");
+            changeBackgroundOfRow(button, "#f5f5f5");
+        }
+        // 클릭된 버튼이 취소상태일 때
+        else if (button.textContent === "취소") {
+            modifyForm.style.display = "none";
+            changeBtnDesign(button, "수정", "#4CAF50");
+            changeBackgroundOfRow(button, "");
+        }
+
+        fillModifyForm(row)
+    }
+
+    function confirmDelete(vacationId) {
+        if (confirm("정말로 삭제하시겠습니까?")) {
+            window.location.href = '/vacations/delete/' + vacationId;
+        }
+    }
+</script>
 </body>
 </html>

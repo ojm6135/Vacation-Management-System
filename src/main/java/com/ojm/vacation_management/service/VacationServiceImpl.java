@@ -32,4 +32,20 @@ public class VacationServiceImpl implements VacationService {
                 .stream().map(VacationDto::fromEntity)
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public void updateVacation(VacationDto vacationDto) {
+        if (vacationRepository.findById(vacationDto.getId()).isEmpty()) {
+            throw new EntityNotFoundException("휴가를 찾을 수 없습니다. (id: " + vacationDto.getId() + ")");
+        }
+        vacationRepository.update(VacationDto.toEntity(vacationDto));
+    }
+
+    @Override
+    public void deleteVacation(int vacationId) {
+        if (vacationRepository.findById(vacationId).isEmpty()) {
+            throw new EntityNotFoundException("휴가를 찾을 수 없습니다. (id: " + vacationId + ")");
+        }
+        vacationRepository.deleteById(vacationId);
+    }
 }

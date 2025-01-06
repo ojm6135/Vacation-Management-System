@@ -2,7 +2,6 @@ package com.ojm.vacation_management.repository;
 
 import com.ojm.vacation_management.domain.QVacation;
 import com.ojm.vacation_management.domain.Vacation;
-import com.ojm.vacation_management.vo.vacation.AppliedVacationStatus;
 import com.ojm.vacation_management.vo.vacation.VacationPeriod;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
@@ -10,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public class VacationRepositoryImpl implements VacationRepository {
@@ -27,6 +27,11 @@ public class VacationRepositoryImpl implements VacationRepository {
     @Override
     public void save(Vacation vacation) {
         em.persist(vacation);
+    }
+
+    @Override
+    public Optional<Vacation> findById(int id) {
+        return Optional.ofNullable(em.find(Vacation.class, id));
     }
 
     @Override
@@ -55,18 +60,16 @@ public class VacationRepositoryImpl implements VacationRepository {
     }
 
     @Override
-    public void updateStatus(int id, AppliedVacationStatus status) {
+    public void update(Vacation updatedVacation) {
+        Vacation target = em.find(Vacation.class, updatedVacation.getId());
 
-    }
-
-    @Override
-    public void updatePeriod(int id, VacationPeriod period) {
-
+        target.changePeriod(updatedVacation.getPeriod());
+        target.changeType(updatedVacation.getType());
+        target.changeReason(updatedVacation.getReason());
     }
 
     @Override
     public void deleteById(int id) {
-        queryFactory.delete(vacation)
-                        .where(vacation.id.eq(id));
+        em.remove(em.find(Vacation.class, id));
     }
 }

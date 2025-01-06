@@ -2,6 +2,7 @@ package com.ojm.vacation_management.dto;
 
 import com.ojm.vacation_management.domain.Vacation;
 import com.ojm.vacation_management.form.VacationForm;
+import com.ojm.vacation_management.form.VacationUpdateForm;
 import com.ojm.vacation_management.vo.vacation.AppliedVacationStatus;
 import com.ojm.vacation_management.vo.vacation.VacationPeriod;
 import com.ojm.vacation_management.vo.vacation.VacationType;
@@ -47,6 +48,17 @@ public class VacationDto {
 
         return VacationDto.builder()
                 .userId(form.getUserId())
+                .period(period)
+                .type(form.getType())
+                .reason(form.getReason())
+                .build();
+    }
+
+    public static VacationDto fromForm(VacationUpdateForm form) {
+        VacationPeriod period = new VacationPeriod(form.getStartDate(), form.getEndDate());
+
+        return VacationDto.builder()
+                .id(form.getId())
                 .period(period)
                 .type(form.getType())
                 .reason(form.getReason())
