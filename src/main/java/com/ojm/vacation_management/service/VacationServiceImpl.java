@@ -36,7 +36,7 @@ public class VacationServiceImpl implements VacationService {
 
     @Override
     public void updateVacation(int vacationId, VacationDto vacationDto) {
-        if (vacationRepository.findById(vacationId).isEmpty()) {
+        if (!exists(vacationId)) {
             throw new EntityNotFoundException("휴가를 찾을 수 없습니다. (id: " + vacationId + ")");
         }
         vacationRepository.update(vacationId, VacationDto.toEntity(vacationDto));
@@ -44,9 +44,14 @@ public class VacationServiceImpl implements VacationService {
 
     @Override
     public void deleteVacation(int vacationId) {
-        if (vacationRepository.findById(vacationId).isEmpty()) {
+        if (!exists(vacationId)) {
             throw new EntityNotFoundException("휴가를 찾을 수 없습니다. (id: " + vacationId + ")");
         }
         vacationRepository.deleteById(vacationId);
+    }
+
+    @Override
+    public boolean exists(int vacationId) {
+        return vacationRepository.findById(vacationId).isPresent();
     }
 }
