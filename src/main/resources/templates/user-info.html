@@ -83,8 +83,7 @@
     <h1>회원 정보</h1>
     <div class="user-info">
         <p><strong>이름:</strong> <span th:text="${userInfo.name}">홍길동</span></p>
-        <p><strong>상태:</strong> <span th:text="${userInfo.status.getDesc()}">근무</span></p>
-        <!-- 추가할 정보들 (예: 이메일, 전화번호 등) -->
+        <p><strong>상태:</strong> <span th:text="${userInfo.status.desc}">근무</span></p>
     </div>
     <button class="button" onclick="history.back()">뒤로 가기</button>
 </div>

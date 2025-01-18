@@ -8,7 +8,6 @@ import com.ojm.vacation_management.vo.user.UserRole;
 import com.ojm.vacation_management.vo.user.UserStatus;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -46,25 +45,6 @@ public class UserServiceImpl implements UserService {
         User user = UserRegistrationDto.toEntity(userRegistrationDto);
         userRepository.save(user);
     }
-
-//    @Override
-//    public UserDto login(LoginDto loginDto) {
-//        Optional<User> userOptional = userRepository.findByUsername(loginDto.getUsername());
-//
-//        // 아이디 존재 여부 확인
-//        if (userOptional.isEmpty()) {
-//            throw new IllegalArgumentException("입력한 정보가 일치하지 않습니다.");
-//        }
-//
-//        User user = userOptional.get();
-//
-//        // 비밀번호 일치 확인
-//        if (EncodePasswordUtils.passwordEncoder().matches(loginDto.getPassword(), user.getPassword())) {
-//            return UserDto.fromEntity(user);
-//        } else {
-//            throw new IllegalArgumentException("입력한 정보가 일치하지 않습니다.");
-//        }
-//    }
 
     @Override
     public List<User> findUsers() {
@@ -112,26 +92,5 @@ public class UserServiceImpl implements UserService {
         }
 
         userRepository.updateUserStatus(id, status);
-    }
-
-    @Override
-    public boolean isCurrentUser(int requestedUserId) {
-        String currentUsername = SecurityContextHolder.getContext().getAuthentication().getName();
-
-        return findOneById(requestedUserId)
-                .getUsername()
-                .equals(currentUsername);
-    }
-
-    @Override
-    public String generateVacationUrlByCurrentUser() {
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        Optional<User> userOptional = userRepository.findByUsername(username);
-
-        if (userOptional.isEmpty()) {
-            throw new IllegalArgumentException("해당 아이디를 갖는 회원이 존재하지 않습니다.");
-        }
-
-        return "/vacations?user_id=" + userOptional.get().getId();
     }
 }

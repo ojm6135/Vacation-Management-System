@@ -1,13 +1,13 @@
 package com.ojm.vacation_management.controller;
 
+import com.ojm.vacation_management.dto.CustomUserDetails;
 import com.ojm.vacation_management.dto.UserRegistrationDto;
 import com.ojm.vacation_management.form.UserRegistrationForm;
 import com.ojm.vacation_management.service.UserService;
 import com.ojm.vacation_management.vo.user.UserRole;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -39,14 +39,14 @@ public class UserController {
         return "login";
     }
 
-//    @PostMapping("/login")
-//    public String login(final @Valid LoginDto loginDto) {
-//        return "redirect:/vacations?user_id=" + userService.login(loginDto).getId();
-//    }
-
     @GetMapping("/{userId}")
     public String getUserById(final @PathVariable int userId, Model model) {
-        // 내 정보 확인.
+        // todo 내 정보 확인.
         return "";
+    }
+
+    @GetMapping("/logged-in")
+    public String LoggedIn(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        return "redirect:/users/" + userDetails.getUserId() + "/vacations";
     }
 }

@@ -10,13 +10,10 @@ import java.util.List;
 
 public interface UserService {
     void join(UserRegistrationDto userRegistrationDto);
-//    UserDto login(LoginDto loginDto);
     List<User> findUsers();
     UserDto findOneById(int id);
     UserDto findOneByUsername(String username);
     List<User> findUsersByStatus(UserStatus userStatus);
     void modifyUserRole(int id, UserRole role);
     void modifyUserStatus(int id, UserStatus status);
-    boolean isCurrentUser(int requestedUserId);
-    String generateVacationUrlByCurrentUser();
 }

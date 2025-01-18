@@ -173,17 +173,17 @@
                 <td th:text="${vacation.reason != '' ? vacation.reason : '.'}"></td>
                 <td th:text="${vacation.status.desc}"></td>
                 <td>
-                    <button class="modify-btn" type="button" onclick="modifyBtnEvent(this)">수정</button>
-                    <button class="delete-btn" type="button" th:onclick="|deleteVacation(${vacation.id})|">삭제</button>
+                    <button class="modify-btn" type="button" th:onclick="|modifyBtnEvent(${userId}, this)|">수정</button>
+                    <button class="delete-btn" type="button" th:onclick="|deleteVacation(${userId}, ${vacation.id})|">삭제</button>
                 </td>
             </tr>
             </tbody>
         </table>
     </div>
 
+    <!--  신청 폼  -->
     <div class="form-container">
-        <form action="/vacations" method="post">
-            <input type="hidden" id="user-id" name="userId" th:value="${userId}" required>
+        <form id="apply-form" th:action="|/users/${userId}/vacations|" method="post">
             <div>
                 <label for="start-date">시작일</label>
                 <input type="date" id="start-date" name="startDate" required>
@@ -207,8 +207,9 @@
         </form>
     </div>
 
-    <div id="modify-form" class="form-container" style="display: none">
-        <form id="modify-form-action" th:method="put">
+    <!--  수정 폼  -->
+    <div id="modify-form-container" class="form-container" style="display: none">
+        <form id="modify-form" th:method="put">
             <div>
                 <label for="modified-start-date">시작일</label>
                 <input type="date" id="modified-start-date" name="startDate" required>
@@ -244,17 +245,18 @@
         button.style.backgroundColor = color;
     }
 
-    function fillModifyForm(row) {
+    function fillModifyForm(userId, row) {
         const cells = row.querySelectorAll('td');
         const cellValues = Array.from(cells).map(cell => cell.textContent.trim());
-        const formElement = document.getElementById("modify-form-action");
+        const modifyForm = document.getElementById("modify-form");
 
-        const id = cellValues[0];
+        const vacationId = cellValues[0];
         const startDate = cellValues[1];
         const endDate = cellValues[2];
         const reason = cellValues[4];
 
-        formElement.action = "/vacations/" + id;
+        modifyForm.action = '/users/' + userId + "/vacations/" + vacationId;
+
         document.getElementById("modified-start-date").value = startDate;
         document.getElementById("modified-end-date").value = endDate;
         document.getElementById("modified-reason").value = reason;
@@ -262,7 +264,7 @@
         const typeSelect = document.getElementById("modified-leave-type");
 
         // Select 박스 값 설정
-        const typeValue = cellValues[3]; // "Vacation", "Sick Leave", etc.
+        const typeValue = cellValues[3];
         for (let option of typeSelect.options) {
             if (option.textContent === typeValue) {
                 option.selected = true;
@@ -271,8 +273,8 @@
         }
     }
 
-    function modifyBtnEvent(button) {
-        const modifyForm = document.getElementById("modify-form");
+    function modifyBtnEvent(userId, button) {
+        const modifyForm = document.getElementById("modify-form-container");
         const formStatus = window.getComputedStyle(modifyForm).display;
         const row = button.closest('tr');
 
@@ -301,14 +303,15 @@
             changeBackgroundOfRow(button, "");
         }
 
-        fillModifyForm(row)
+        fillModifyForm(userId, row)
     }
 
-    function deleteVacation(vacationId) {
+    function deleteVacation(userId, vacationId) {
         if (confirm("정말로 삭제하시겠습니까?")) {
             const form = document.createElement('form');
+
             form.method = 'post';
-            form.action = `/vacations/${vacationId}`;
+            form.action = '/users/' + userId + "/vacations/" + vacationId;
 
             const methodInput = document.createElement('input');
             methodInput.type = 'hidden';

@@ -3,7 +3,6 @@ package com.ojm.vacation_management.controller;
 import com.ojm.vacation_management.dto.VacationDto;
 import com.ojm.vacation_management.form.VacationForm;
 import com.ojm.vacation_management.form.VacationUpdateForm;
-import com.ojm.vacation_management.service.UserService;
 import com.ojm.vacation_management.service.VacationService;
 import com.ojm.vacation_management.vo.vacation.VacationType;
 import jakarta.validation.Valid;
@@ -13,30 +12,23 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 @Controller
-@RequestMapping("/vacations")
+@RequestMapping("/users/{userId}/vacations")
 public class VacationController {
-    private final UserService userService;  // url 생성을 위함.
     private final VacationService vacationService;
 
     @Autowired
-    public VacationController(UserService userService, VacationService vacationService) {
-        this.userService = userService;
+    public VacationController(VacationService vacationService) {
         this.vacationService = vacationService;
     }
 
     @PostMapping
-    public String applyVacation(final @Valid VacationForm vacationForm) {
+    public String applyVacation(final @PathVariable("userId") int userId, final @Valid VacationForm vacationForm) {
         vacationService.apply(VacationDto.fromForm(vacationForm));
-        return "redirect:/vacations?user_id=" + vacationForm.getUserId();
-    }
-
-    @GetMapping("/my")
-    public String redirectToMyVacations() {
-        return "redirect:" + userService.generateVacationUrlByCurrentUser();
+        return "redirect:/users/" + userId + "/vacations";
     }
 
     @GetMapping
-    public String getMyVacations(final @RequestParam(name = "user_id") int userId, Model model) {
+    public String getMyVacations(final @PathVariable("userId") int userId, Model model) {
         model.addAttribute("vacations", vacationService.getAllVacationsByUserId(userId));
         model.addAttribute("userId", userId);
         model.addAttribute("types", VacationType.values());
@@ -44,14 +36,17 @@ public class VacationController {
     }
 
     @PutMapping("/{vacationId}")
-    public String updateVacation(final @PathVariable int vacationId, final @Valid VacationUpdateForm form) {
+    public String updateVacation(final @PathVariable("userId") int userId,
+                                 final @PathVariable("vacationId") int vacationId,
+                                 final @Valid VacationUpdateForm form) {
         vacationService.updateVacation(vacationId, VacationDto.fromForm(form));
-        return "redirect:/vacations/my";
+        return "redirect:/users/" + userId + "/vacations";
     }
 
     @DeleteMapping("/{vacationId}")
-    public String deleteVacation(final @PathVariable int vacationId) {
+    public String deleteVacation(final @PathVariable("userId") int userId,
+                                 final @PathVariable("vacationId") int vacationId) {
         vacationService.deleteVacation(vacationId);
-        return "redirect:/vacations/my";
+        return "redirect:/users/" + userId + "/vacations";
     }
 }
