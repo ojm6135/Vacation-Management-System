@@ -5,6 +5,7 @@ import com.ojm.vacation_management.repository.VacationRepository;
 import com.ojm.vacation_management.vo.vacation.AppliedVacationStatus;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,12 +22,14 @@ public class VacationServiceImpl implements VacationService {
         this.vacationRepository = vacationRepository;
     }
 
+    @PreAuthorize("@customAuth.isOwner(#userId, authentication)")
     @Override
-    public void apply(VacationDto vacationDto) {
+    public void apply(int userId, VacationDto vacationDto) {
         vacationDto.setStatus(AppliedVacationStatus.PENDING);
         vacationRepository.save(VacationDto.toEntity(vacationDto));
     }
 
+    @PreAuthorize("@customAuth.isOwner(#userId, authentication)")
     @Override
     public List<VacationDto> getAllVacationsByUserId(int userId) {
         return vacationRepository.findAllByUserId(userId)
@@ -34,16 +37,18 @@ public class VacationServiceImpl implements VacationService {
                 .collect(Collectors.toList());
     }
 
+    @PreAuthorize("@customAuth.isOwner(#userId, authentication)")
     @Override
-    public void updateVacation(int vacationId, VacationDto vacationDto) {
+    public void updateVacation(int userId, int vacationId, VacationDto vacationDto) {
         if (!exists(vacationId)) {
             throw new EntityNotFoundException("휴가를 찾을 수 없습니다. (id: " + vacationId + ")");
         }
         vacationRepository.update(vacationId, VacationDto.toEntity(vacationDto));
     }
 
+    @PreAuthorize("@customAuth.isOwner(#userId, authentication)")
     @Override
-    public void deleteVacation(int vacationId) {
+    public void deleteVacation(int userId, int vacationId) {
         if (!exists(vacationId)) {
             throw new EntityNotFoundException("휴가를 찾을 수 없습니다. (id: " + vacationId + ")");
         }

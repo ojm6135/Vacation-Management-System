@@ -1,15 +1,12 @@
-package com.ojm.vacation_management.service;
+package com.ojm.vacation_management.security;
 
 import com.ojm.vacation_management.domain.User;
-import com.ojm.vacation_management.dto.CustomUserDetails;
 import com.ojm.vacation_management.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
@@ -22,12 +19,9 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Optional<User> userOptional = userRepository.findByUsername(username);
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("회원이 존재하지 않습니다. (아이디: " + username + ")"));
 
-        if (userOptional.isEmpty()) {
-            return null;
-        }
-
-        return new CustomUserDetails(userOptional.get());
+        return new CustomUserDetails(user);
     }
 }

@@ -1,6 +1,6 @@
 package com.ojm.vacation_management.controller;
 
-import com.ojm.vacation_management.dto.CustomUserDetails;
+import com.ojm.vacation_management.security.CustomUserDetails;
 import com.ojm.vacation_management.dto.UserRegistrationDto;
 import com.ojm.vacation_management.form.UserRegistrationForm;
 import com.ojm.vacation_management.service.UserService;

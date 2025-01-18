@@ -1,4 +1,4 @@
-package com.ojm.vacation_management.dto;
+package com.ojm.vacation_management.security;
 
 import com.ojm.vacation_management.domain.User;
 import org.springframework.security.core.GrantedAuthority;

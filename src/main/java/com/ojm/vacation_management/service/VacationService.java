@@ -5,9 +5,9 @@ import com.ojm.vacation_management.dto.VacationDto;
 import java.util.List;
 
 public interface VacationService {
-    void apply(VacationDto vacationDto);
+    void apply(int userId, VacationDto vacationDto);
     List<VacationDto> getAllVacationsByUserId(int userId);
-    void updateVacation(int vacationId, VacationDto vacationDto);
-    void deleteVacation(int vacationId);
+    void updateVacation(int userId, int vacationId, VacationDto vacationDto);
+    void deleteVacation(int userId, int vacationId);
     boolean exists(int vacationId);
 }

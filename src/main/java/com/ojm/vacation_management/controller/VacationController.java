@@ -23,7 +23,7 @@ public class VacationController {
 
     @PostMapping
     public String applyVacation(final @PathVariable("userId") int userId, final @Valid VacationForm vacationForm) {
-        vacationService.apply(VacationDto.fromForm(vacationForm));
+        vacationService.apply(userId, VacationDto.fromForm(vacationForm));
         return "redirect:/users/" + userId + "/vacations";
     }
 
@@ -39,14 +39,14 @@ public class VacationController {
     public String updateVacation(final @PathVariable("userId") int userId,
                                  final @PathVariable("vacationId") int vacationId,
                                  final @Valid VacationUpdateForm form) {
-        vacationService.updateVacation(vacationId, VacationDto.fromForm(form));
+        vacationService.updateVacation(userId, vacationId, VacationDto.fromForm(form));
         return "redirect:/users/" + userId + "/vacations";
     }
 
     @DeleteMapping("/{vacationId}")
     public String deleteVacation(final @PathVariable("userId") int userId,
                                  final @PathVariable("vacationId") int vacationId) {
-        vacationService.deleteVacation(vacationId);
+        vacationService.deleteVacation(userId, vacationId);
         return "redirect:/users/" + userId + "/vacations";
     }
 }
