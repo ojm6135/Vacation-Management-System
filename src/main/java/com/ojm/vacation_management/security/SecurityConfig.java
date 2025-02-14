@@ -20,6 +20,7 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests((auth) -> auth
                         .requestMatchers("/", "/users/login", "/users/signup").permitAll()
+                        .requestMatchers("/static/css/**", "/static/js/**").permitAll()
                         .anyRequest().authenticated()
                 );
 
@@ -34,12 +35,12 @@ public class SecurityConfig {
 
         return http.build();
     }
-
-    @Bean
-    public WebSecurityCustomizer webSecurityCustomizer(){
-        return web -> web.ignoring()
-                .requestMatchers("/static/css/**", "/static/js/**");
-    }
+//
+//    @Bean
+//    public WebSecurityCustomizer webSecurityCustomizer(){
+//        return web -> web.ignoring()
+//                .requestMatchers("/static/css/**", "/static/js/**");
+//    }
 
     @Bean
     public BCryptPasswordEncoder bCryptPasswordEncoder() {
