@@ -7,6 +7,7 @@ import com.ojm.vacation_management.repository.UserRepository;
 import com.ojm.vacation_management.vo.user.UserRole;
 import com.ojm.vacation_management.vo.user.UserStatus;
 import jakarta.persistence.EntityNotFoundException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -15,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @Transactional
 @Service
 public class UserServiceImpl implements UserService {
