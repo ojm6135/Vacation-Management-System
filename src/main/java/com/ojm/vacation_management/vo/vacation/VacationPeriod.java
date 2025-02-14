@@ -28,6 +28,11 @@ public final class VacationPeriod {
             throw new InvalidDateRangeException("시작일은 종료일 이전이어야 합니다.");
         }
 
+        // 시작날짜가 신청일보다 늦어야 함.
+        if (startDate.isBefore(LocalDate.now().plusDays(1))) {
+            throw new InvalidDateRangeException("시작일은 신청일 이후여야 합니다.");
+        }
+
         return true;
     }
 
